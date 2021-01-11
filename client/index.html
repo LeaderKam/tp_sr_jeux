@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body style="background-color: antiquewhite">
+    <form class="container" id="signDiv">
+      <div class="form-group">
+        <label for="exampleInputEmail1">Username</label>
+        <input
+          type="text"
+          class="form-control"
+          id="signDiv-username"
+          aria-describedby="emailHelp"
+          placeholder="Enter email"
+        />
+        <small id="emailHelp" class="form-text text-muted"
+          >We'll never share your email with anyone else.</small
+        >
+      </div>
+      <div class="form-group">
+        <label for="exampleInputPassword1">Password</label>
+        <input
+          type="password"
+          class="form-control"
+          id="signDiv-password"
+          placeholder="Password"
+        />
+      </div>
+      <div class="form-check">
+        <input type="checkbox" class="form-check-input" id="exampleCheck1" />
+        <label class="form-check-label" for="exampleCheck1">Check me out</label>
+      </div>
+      <button type="submit" class="btn btn-primary" id="signDiv-signIn">
+        Connect
+      </button>
+      <button type="submit" class="btn btn-primary" id="signDiv-signUp">
+        Sign Up
+      </button>
+    </form>
+
+    <div id="gameDiv" style="display: none" class="container">
+      <div class="row justify-content-md-center">
+        <div class="col col-lg-2">id: <input readonly id="playerName" value=""></input>  Score: <input readonly id="score" value=""></input></div>
+        <div class="col-md-auto">
+          <canvas
+            id="ctx"
+            width="500"
+            height="500"
+            style="border: 1px solid beige; background-color: rgb(5, 108, 168)"
+          ></canvas>
+        </div>
+        <div class="col col-lg-2">3 of 3</div>
+      </div>
+    </div>
+
+    <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+    <script>
+      var ctx = document.getElementById("ctx").getContext("2d");
+      ctx.font = "30px Arial";
+
+      var socket = io();
+      // var happy= function(){socket.emit('happy',{
+      //     reason:'from client'+random
+      // });
+      // }
+
+      var signDiv = document.getElementById("signDiv");
+      var signDivUsername = document.getElementById("signDiv-username");
+      var signDivSignIn = document.getElementById("signDiv-signIn");
+      var signDivSignUp = document.getElementById("signDiv-signUp");
+      var signDivPassword = document.getElementById("signDiv-password");
+      var playerScore=document.getElementById("score");
+      var playerName=document.getElementById("playerName")
+
+      signDivSignIn.onclick = function () {
+        socket.emit("signIn", {
+          username: signDivUsername.value,
+          password: signDivPassword.value,
+        });
+      };
+      signDivSignUp.onclick = function () {
+        socket.emit("signUp", {
+          username: signDivUsername.value,
+          password: signDivPassword.value,
+        });
+      };
+      socket.on("signInResponse", function (data) {
+        if (data.success) {
+          signDiv.style.display = "none";
+          gameDiv.style.display = "inline-block";
+        } else alert("Sign in unsuccessul.");
+      });
+      socket.on("signUpResponse", function (data) {
+        if (data.success) {
+          alert("Sign up successul.");
+        } else alert("Sign up unsuccessul.");
+      });
+
+      socket.on("newPositions", function (data) {
+        ctx.clearRect(0, 0, 500, 500);
+
+        for (var i = 0; i < data.length; i++) {
+          console.log(data[i].score);
+          playerName.value=data[i].number;
+          playerScore.value=data[i].score;
+
+          for (var e in data[i].balls) {
+            ctx.beginPath();
+
+            ctx.arc(
+              data[i].balls[e].x,
+              data[i].balls[e].y,
+              data[i].balls[e].radius,
+              data[i].balls[e].start,
+              data[i].balls[e].angle,
+              false
+            );
+            ctx.stroke();
+            ctx.fillStyle = "#FF4422";
+            ctx.fill();
+          }
+          ctx.fillStyle = "#000000";
+          ctx.fillRect(data[i].x, data[i].y, 20, 20);
+        }
+      });
+
+      document.onkeydown = function (event) {
+        if (event.keyCode === 68 || event.keyCode === 39)
+          //d
+          socket.emit("keyPress", { inputId: "right", state: true });
+        else if (event.keyCode === 83 || event.keyCode === 40)
+          //s
+          socket.emit("keyPress", { inputId: "down", state: true });
+        else if (event.keyCode === 81 || event.keyCode === 37)
+          //a
+          socket.emit("keyPress", { inputId: "left", state: true });
+        else if (event.keyCode === 90 || event.keyCode === 38)
+          //w
+          socket.emit("keyPress", { inputId: "up", state: true });
+      };
+
+      document.onkeyup = function (event) {
+        if (event.keyCode === 68 || event.keyCode === 39)
+          //d
+          socket.emit("keyPress", { inputId: "right", state: false });
+        else if (event.keyCode === 83 || event.keyCode === 40)
+          //s
+          socket.emit("keyPress", { inputId: "down", state: false });
+        else if (event.keyCode === 81 || event.keyCode === 37)
+          //a
+          socket.emit("keyPress", { inputId: "left", state: false });
+        else if (event.keyCode === 90 || event.keyCode === 38)
+          //w
+          socket.emit("keyPress", { inputId: "up", state: false });
+      };
+    </script>
+
+    <!-- <button onclick="happy()">happy</button> -->
+  </body>
+</html>
