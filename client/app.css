@@ -1,0 +1,13 @@
+#signDiv{
+    margin: 30vh 70vh;
+    /* margin-top:500px; */
+    width: 80vh;
+    height: 30vh;
+    background-color: antiquewhite;
+    border-radius: 20px;
+    padding: 10px;
+    /* display: block; */
+}
+body{
+    background-color: white;
+}

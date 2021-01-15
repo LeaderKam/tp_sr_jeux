@@ -5,8 +5,13 @@ var server = require('http').Server(app);
 
 //communication with the file
 app.get('/', function (req, res) {
-    res.sendFile(__dirname + '/client/index.html')
+    res.sendFile(__dirname + '/client/index.html');
+
 });
+
+// help to have access to all resources in client dir
+app.use('/', express.static(__dirname + '/client'));
+
 
 server.listen(PORT, () => console.log("listening on *:" + PORT));
 app.use('/client', express.static(__dirname + '/client'));
@@ -39,6 +44,7 @@ var addUser = function(data,cb){
 		cb();
 	},10);
 }
+
 
 
 var io = require('socket.io')(server, {});
@@ -135,27 +141,38 @@ io.sockets.on('connection', function (socket) {
     PLAYER_LIST[socket.id] = player;
 
 
-    socket.on('signIn',function(data){
-		isValidPassword(data,function(res){
+    socket.on('enterInRoom',function(data){
+		isGameStarted(data,function(res){
 			if(res){
 				Player.onConnect(socket);
 				socket.emit('signInResponse',{success:true});
 			} else {
 				socket.emit('signInResponse',{success:false});			
 			}
-		});
-	});
-	socket.on('signUp',function(data){
-		isUsernameTaken(data,function(res){
+        });
+        
+        isUsernameTaken(data,function(res){
 			if(res){
-				socket.emit('signUpResponse',{success:false});		
+				socket.emit('enterResponse',{success:false});		
 			} else {
 				addUser(data,function(){
-					socket.emit('signUpResponse',{success:true});					
+					socket.emit('enterResponse',{success:true});					
 				});
 			}
-		});		
+        });		
 	});
+	// socket.on('newGame',function(data){
+	// 	isGame(data,function(res){
+	// 		if(res){
+	// 			socket.emit('newGameResponse',{success:false});		
+	// 		} else {
+	// 			newGame(data,function(){
+	// 				socket.emit('newGameResponse',{success:true});					
+	// 			});
+	// 		}
+    //     });
+       
+	// });
 	
 	
 	// socket.on('disconnect',function(){
@@ -166,10 +183,16 @@ io.sockets.on('connection', function (socket) {
     //     delete Player.list[socket.id];
     // }
 
-
+    socket.on('newGame',function(data){
+        if(data.success){
+            console.log("envoie");
+            socket.emit('newGameResponse',{success:true});
+            console.log("envoyer");
+        }
+    });
     socket.on('disconnect', function () {
-        delete SOCKET_LIST[socket.id];
-        delete PLAYER_LIST[socket.id];
+        delete SOCKET_LIST[socket.id]; //delete the client connection
+        delete PLAYER_LIST[socket.id]; //delete the
     });
 
     socket.on('keyPress', function (data) {
@@ -183,7 +206,7 @@ io.sockets.on('connection', function (socket) {
             player.pressingDown = data.state
     });
 })
-
+var WINNER={}
 
 setInterval(function () {
     var pack = [];
@@ -197,9 +220,27 @@ setInterval(function () {
             score: player.score,
             balls: circles
         });
+        WINNER[i]=player.score
     }
+    if(Object.keys(circles).length === 18){
+        
+       for (const key in PLAYER_LIST) {
+        
+           if (Math.max(...Object.values(WINNER)) === PLAYER_LIST[key].score){
+               console.log(PLAYER_LIST[key].number+" win")
+               for (var i in SOCKET_LIST) {
+                var socket = SOCKET_LIST[i];
+                socket.emit('winner', PLAYER_LIST[key].number);
+                // socket.emit('winner',winner);
+            }
+        }
+       }
+        // var winner=WIN_SCORE(WINNER);
+    }
+    // console.log(Object.keys(circles).length);
     for (var i in SOCKET_LIST) {
         var socket = SOCKET_LIST[i];
         socket.emit('newPositions', pack);
+        
     }
 }, 1000 / 25);
