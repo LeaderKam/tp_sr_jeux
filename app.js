@@ -103,7 +103,7 @@ setInterval(function () {
     for (var i in PLAYER_LIST) {
         var player = PLAYER_LIST[i];
         player.updatePosition(circles);
-        player.updateState(WINNER,circles,pack,player,i);
+        player.updateState(WINNER,circles,pack,i);
     }
     verifyWin(circles, WINNER, PLAYER_LIST,SOCKET_LIST,pack);
     for (var i in SOCKET_LIST) {

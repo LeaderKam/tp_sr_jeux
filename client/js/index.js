@@ -1,5 +1,9 @@
-const {BG_COLOUR, PLAYER_COLOUR, CIRCLES_COLOUR}=require('./constantClient');
-const {paintGame,drawPlayer,drawCircle}=require("./gameClientSide");
+// var {BG_COLOUR, PLAYER_COLOUR, CIRCLES_COLOUR} = require('./constantClient');
+// var {BG_COLOUR,PLAYER_COLOUR,CIRCLES_COLOUR} = require('./constantClient');
+var BG_COLOUR = '#faebd7';
+var PLAYER_COLOUR = '#'+(Math.random()*0xFFFFFF<<0).toString(16);
+var CIRCLES_COLOUR = 'red';
+// var {paintGame,drawPlayer,drawCircle} = require("./gameClientSide");
 // socket.on('init', handleInit);
 // socket.on('gameState', handleGameState);
 // socket.on('gameOver', handleGameOver);
@@ -38,7 +42,6 @@ var signDivSignUp = document.getElementById('signDiv-signUp');
 var signDivPassword = document.getElementById('signDiv-password');
 
 signDivSignIn.onclick = function(){
-    alert('bien');
     socket.emit('signIn',{username:signDivUsername.value,password:signDivPassword.value});
 }
 signDivSignUp.onclick = function(){
@@ -140,41 +143,42 @@ document.onkeyup = function (event) {
         //w
         socket.emit("keyPress", { inputId: "up", state: false });
 };
-function newGame(data) {
-    ctx.clearRect(0, 0, 500, 500);
+// function newGame(data) {
+//     ctx.clearRect(0, 0, 500, 500);
 
-    for (var i = 0; i < data.length; i++) {
-        console.log(data[i].score);
-        playerName.value = data[i].number;
-        playerScore.value = data[i].score;
+//     for (var i = 0; i < data.length; i++) {
+//         console.log(data[i].score);
+//         playerName.value = data[i].number;
+//         playerScore.value = data[i].score;
 
-        for (var e in data[i].balls) {
-            ctx.beginPath();
+//         for (var e in data[i].balls) {
+//             ctx.beginPath();
 
-            ctx.arc(
-                data[i].balls[e].x,
-                data[i].balls[e].y,
-                data[i].balls[e].radius,
-                data[i].balls[e].start,
-                data[i].balls[e].angle,
-                false
-            );
-            ctx.stroke();
-            ctx.fillStyle = "#FF4422";
-            ctx.fill();
-        }
-        ctx.fillStyle = "#000000";
-        ctx.fillRect(data[i].x, data[i].y, 20, 20);
-    }
-}
+//             ctx.arc(
+//                 data[i].balls[e].x,
+//                 data[i].balls[e].y,
+//                 data[i].balls[e].radius,
+//                 data[i].balls[e].start,
+//                 data[i].balls[e].angle,
+//                 false
+//             );
+//             ctx.stroke();
+//             ctx.fillStyle = "#FF4422";
+//             ctx.fill();
+//         }
+//         ctx.fillStyle = "#000000";
+//         ctx.fillRect(data[i].x, data[i].y, 20, 20);
+//     }
+// }
 
 socket.on("newPositions", function (data) {
     // newGame(data);
     ctx.clearRect(0, 0, 500, 500);
 
     // paintGame(playerName, playerScore, data,ctx);
+    if(data[0]==null) return ;
     for (var i = 0; i < data.length; i++) {
-        console.log(data[i].score);
+        console.log(data[i]);
         playerName.value = data[i].number;
         playerScore.value = data[i].score;
     

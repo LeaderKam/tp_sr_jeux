@@ -64,11 +64,11 @@ function paintGame(playerName,playerScore,data,ctx) {
 }
 
 function drawPlayer(){
-
+console.log("dfghjk");
 }
 
 function drawCircle(){
-
+console.log("sdfghjk");
 }
 
 // function paintGame(state) {

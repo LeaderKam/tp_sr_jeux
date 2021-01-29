@@ -40,15 +40,15 @@ class Player {
             }
         }
     }
-    updateState(WINNER, circles, pack, player, i) {
+    updateState(WINNER, circles, pack, i) {
         pack.push({
-            x: player.x,
-            y: player.y,
-            number: player.number,
-            score: player.score,
+            x: this.x,
+            y: this.y,
+            number: this.number,
+            score: this.score,
             balls: circles
         });
-        WINNER[i] = player.score
+        WINNER[i] = this.score
     }
 
 }
