@@ -1,4 +1,3 @@
-// var {BG_COLOUR, PLAYER_COLOUR, CIRCLES_COLOUR} = require('./constantClient');
 // var {BG_COLOUR,PLAYER_COLOUR,CIRCLES_COLOUR} = require('./constantClient');
 var BG_COLOUR = '#faebd7';
 var PLAYER_COLOUR = '#' + (Math.random() * 0xFFFFFF << 0).toString(16);
@@ -12,28 +11,9 @@ socket.on("winner", winner);
 socket.on("start", start);
 socket.on("newPositions", newPositions);
 socket.on("resetGame", resetGame);
-// socket.on('init', handleInit);
-// socket.on('gameState', handleGameState);
-// socket.on('gameOver', handleGameOver);
-// socket.on('gameCode', handleGameCode);
-// socket.on('unknownCode', handleUnknownCode);
-// socket.on('tooManyPlayers', handleTooManyPlayers);
-// socket.on('newPosition', handleTooManyPlayers);
-
-
-// newGameBtn.addEventListener('click', newGame);
-// joinGameBtn.addEventListener('click', joinGame);
-// window.onbeforeunload = function () {return false;}
 
 var ctx = document.getElementById("ctx").getContext("2d");
 ctx.font = "30px Arial";
-
-
-// var happy= function(){socket.emit('happy',{
-//     reason:'from client'+random
-// });
-// }
-
 
 var initialScreen = document.getElementById('initialScreen');
 var waitingRoom = document.getElementById('waitingRoom');
@@ -146,33 +126,7 @@ document.onkeyup = function (event) {
         //w
         socket.emit("keyPress", { inputId: "up", state: false });
 };
-// function newGame(data) {
-//     ctx.clearRect(0, 0, 500, 500);
 
-//     for (var i = 0; i < data.length; i++) {
-//         console.log(data[i].score);
-//         playerName.value = data[i].number;
-//         playerScore.value = data[i].score;
-
-//         for (var e in data[i].balls) {
-//             ctx.beginPath();
-
-//             ctx.arc(
-//                 data[i].balls[e].x,
-//                 data[i].balls[e].y,
-//                 data[i].balls[e].radius,
-//                 data[i].balls[e].start,
-//                 data[i].balls[e].angle,
-//                 false
-//             );
-//             ctx.stroke();
-//             ctx.fillStyle = "#FF4422";
-//             ctx.fill();
-//         }
-//         ctx.fillStyle = "#000000";
-//         ctx.fillRect(data[i].x, data[i].y, 20, 20);
-//     }
-// }
 function resetGame() {
     // playerNumber = null;
     gameCode.value = '';
