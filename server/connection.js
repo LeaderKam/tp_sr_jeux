@@ -4,9 +4,9 @@ var USERS = {
 
 }
 
-var isValidPassword = function(data,cb){
+var isValidPassword = function(data,code,cb){
 	setTimeout(function(){
-        cb(USERS[data.username] === data.password);
+        cb(data.password===code+'');
 	},10);
 }
 var isUsernameTaken = function(data,cb){

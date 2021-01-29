@@ -1,4 +1,4 @@
-#signDiv{
+#initialScreen{
     margin: 30vh 70vh;
     /* margin-top:500px; */
     width: 80vh;
@@ -10,4 +10,38 @@
 }
 body{
     background-color: white;
+}
+#gameScreen{
+    /* margin: 30vh 70vh;*/
+    margin-top:50px;
+    /* width: 70vh;
+    height: 30vh;
+    padding: 10px; */
+}
+#gameStartedDiv{
+    margin: 30vh 70vh;
+    /* margin-top:500px; */
+    width: 80vh;
+    height: 30vh;
+    background-color: antiquewhite;
+    border-radius: 20px;
+    padding: 10px;
+}
+#winScreen, #waitingRoom {
+    margin: 30vh 70vh;
+    /* margin-top:500px; */
+    width: 80vh;
+    height: 30vh;
+    background-color: antiquewhite;
+    border-radius: 20px;
+    padding: 10px;
+}
+#gameCodeDisplay{
+    margin: 5vh 70vh;
+    /* margin-top:500px; */
+    width: 60vh;
+    height: 30vh;
+
+   border-radius: 20px;
+    padding: 10px;
 }

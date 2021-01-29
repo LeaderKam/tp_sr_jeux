@@ -1,9 +1,17 @@
 // var {BG_COLOUR, PLAYER_COLOUR, CIRCLES_COLOUR} = require('./constantClient');
 // var {BG_COLOUR,PLAYER_COLOUR,CIRCLES_COLOUR} = require('./constantClient');
 var BG_COLOUR = '#faebd7';
-var PLAYER_COLOUR = '#'+(Math.random()*0xFFFFFF<<0).toString(16);
+var PLAYER_COLOUR = '#' + (Math.random() * 0xFFFFFF << 0).toString(16);
 var CIRCLES_COLOUR = 'red';
 // var {paintGame,drawPlayer,drawCircle} = require("./gameClientSide");
+var socket = io();
+socket.on("gameStarted", gameStarted);
+socket.on('joinResponse', joinResponse);
+socket.on('newGameResponse', newGameResponse);
+socket.on("winner", winner);
+socket.on("start", start);
+socket.on("newPositions", newPositions);
+socket.on("resetGame", resetGame);
 // socket.on('init', handleInit);
 // socket.on('gameState', handleGameState);
 // socket.on('gameOver', handleGameOver);
@@ -12,12 +20,6 @@ var CIRCLES_COLOUR = 'red';
 // socket.on('tooManyPlayers', handleTooManyPlayers);
 // socket.on('newPosition', handleTooManyPlayers);
 
-// const gameScreen = document.getElementById('gameScreen');
-// const initialScreen = document.getElementById('initialScreen');
-// const newGameBtn = document.getElementById('newGameButton');
-// const joinGameBtn = document.getElementById('joinGameButton');
-// const gameCodeInput = document.getElementById('gameCodeInput');
-// const gameCodeDisplay = document.getElementById('gameCodeDisplay');
 
 // newGameBtn.addEventListener('click', newGame);
 // joinGameBtn.addEventListener('click', joinGame);
@@ -26,43 +28,67 @@ var CIRCLES_COLOUR = 'red';
 var ctx = document.getElementById("ctx").getContext("2d");
 ctx.font = "30px Arial";
 
-var socket = io();
+
 // var happy= function(){socket.emit('happy',{
 //     reason:'from client'+random
 // });
 // }
 
-//sign
-var initialScreen = document.getElementById('initialScreen');
-var roomStandDiv = document.getElementById('roomStandDiv');
-var winDiv = document.getElementById('winDiv');
-var signDivUsername = document.getElementById('signDiv-username');
-var signDivSignIn = document.getElementById('signDiv-signIn');
-var signDivSignUp = document.getElementById('signDiv-signUp');
-var signDivPassword = document.getElementById('signDiv-password');
 
-signDivSignIn.onclick = function(){
-    socket.emit('signIn',{username:signDivUsername.value,password:signDivPassword.value});
+var initialScreen = document.getElementById('initialScreen');
+var waitingRoom = document.getElementById('waitingRoom');
+var winScreen = document.getElementById('winScreen');
+var gameCodeDisplay = document.getElementById('gameCodeDisplay');
+var joinGameBtn = document.getElementById('joinGameButton');
+var newGameBtn = document.getElementById('newGameButton');
+var resetBtn = document.getElementById('ResetButton');
+var playerUsername = document.getElementById('playerUsername');
+var gameCode = document.getElementById('gameCode');
+var gameScreen = document.getElementById('gameScreen');
+
+
+joinGameBtn.onclick = function () {
+    socket.emit('join', { username: playerUsername.value, password: gameCode.value });
 }
-signDivSignUp.onclick = function(){
-    socket.emit('signUp',{username:signDivUsername.value,password:signDivPassword.value});
+newGameBtn.onclick = function () {
+    socket.emit('newGame', { username: playerUsername.value, password: gameCode.value });
 }
-socket.on('signInResponse',function(data){
-    if(data.success){
+resetBtn.onclick = function () {
+    socket.emit('reset');
+}
+
+
+
+function joinResponse(data) {
+    if (data.success) {
         initialScreen.style.display = 'none';
         gameScreen.style.display = 'none';
-        roomStandDiv.style.display="inline-block";
-        roomStand.innerHTML= "Attente d'autre joyeur";
+        waitingRoom.style.display = "inline-block";
+        waiting.innerHTML = "Attente d'autre joueur";
+        newGameBtn.disabled=false;
+        joinGameBtn.disabled=true;
     } else
         alert("Sign in unsuccessul.");
-});
-socket.on('signUpResponse',function(data){
-    if(data.success){
-        alert("Sign up successul.");
-    } else
-        alert("Sign up unsuccessul.");
-});
+};
 
+function newGameResponse(data) {
+    if (data.success) {
+        initialScreen.style.display = 'none';
+        gameScreen.style.display = 'none';
+        waitingRoom.style.display = "inline-block";
+        waiting.innerHTML = "Attente d'autre joyeur";
+        newGameBtn.disabled=true;
+        joinGameBtn.disabled=false;
+    } else
+        alert("new Game unsuccessul.");
+};
+
+socket.on('disableBtn',function(data){
+    newGameBtn.disabled=true;
+    joinGameBtn.disabled=false;
+    gameCodeDisplay.style.display="block";
+    gameCodeDisplay.innerHTML=data;
+});
 //game
 var ctx = document.getElementById("ctx").getContext("2d");
 ctx.font = '30px Arial';
@@ -75,44 +101,21 @@ ctx.font = '30px Arial';
 var playerScore = document.getElementById("score");
 var playerName = document.getElementById("playerName")
 
-// enterRoomBtn.onclick = function () {
-//     socket.emit("joinGame", {
-//         username: signDivUsername.value,
-//         password: signDivPassword.value,
-//     });
-// };
-// newGameBtn.onclick = function () {
-//     socket.emit("newGame", {
-//         username: joinPlayerNameInput.value,
-//         success:true
-//         // password: signDivPassword.value,
-//     });
-// };
-// socket.on("signInResponse", function (data) {
-//     if (data.success) {
-//         signDiv.style.display = "none";
-//         gameScreen.style.display = "inline-block";
-//     } else alert("Sign in unsuccessul.");
-// });
-// socket.on("newGameResponse", function (data) {
-//     if (data.success) {
-//         alert("new game successul created");
-//         initialScreen.style.display = "none";
-//         gameScreen.style.display = "inline-block";
-//     } else alert("Sign up unsuccessul.");
-// });
-
-socket.on("winner", function (data) {
+//for know the winner
+function winner(data) {
     initialScreen.style.display = "none";
     gameScreen.style.display = "none";
-    winDiv.style.display = "block";
-    win.innerHTML="Player " +data +" won";
-})
-socket.on("start",function(){
+    gameCodeDisplay.style.display="none";
+    winScreen.style.display = "block";
+    win.innerHTML = "Player " + data + " won";
+};
+
+//for know the game has started
+function start() {
     initialScreen.style.display = "none";
-    gameScreen.style.display = "inline-block";
-    roomStandDiv.style.display="none";
-});
+    gameScreen.style.display = "block";
+    waitingRoom.style.display = "none";
+};
 
 document.onkeydown = function (event) {
     if (event.keyCode === 68 || event.keyCode === 39)
@@ -170,34 +173,50 @@ document.onkeyup = function (event) {
 //         ctx.fillRect(data[i].x, data[i].y, 20, 20);
 //     }
 // }
+function resetGame() {
+    // playerNumber = null;
+    gameCode.value = '';
+    initialScreen.style.display = "block";
+    gameScreen.style.display = "none";
+    winScreen.style.display="none";
+    gameCodeDisplay.style.display="none";
+    joinGameBtn.disabled=false;
+    newGameBtn.disabled=false;
+}
 
-socket.on("newPositions", function (data) {
+function gameStarted() {
+    waitingRoom.style.display = "inline-block";
+    initialScreen.style.display= "none";
+    waiting.innerHTML = "The Game has allready started";
+
+};
+function newPositions(data) {
     // newGame(data);
     ctx.clearRect(0, 0, 500, 500);
 
     // paintGame(playerName, playerScore, data,ctx);
-    if(data[0]==null) return ;
+    if (data[0] == null) return;
     for (var i = 0; i < data.length; i++) {
         console.log(data[i]);
         playerName.value = data[i].number;
         playerScore.value = data[i].score;
-    
+
         for (var e in data[i].balls) {
-          ctx.beginPath();
-    
-          ctx.arc(
-            data[i].balls[e].x,
-            data[i].balls[e].y,
-            data[i].balls[e].radius,
-            data[i].balls[e].start,
-            data[i].balls[e].angle,
-            false
-          );
-          ctx.stroke();
-          ctx.fillStyle = CIRCLES_COLOUR;
-          ctx.fill();
+            ctx.beginPath();
+
+            ctx.arc(
+                data[i].balls[e].x,
+                data[i].balls[e].y,
+                data[i].balls[e].radius,
+                data[i].balls[e].start,
+                data[i].balls[e].angle,
+                false
+            );
+            ctx.stroke();
+            ctx.fillStyle = CIRCLES_COLOUR;
+            ctx.fill();
         }
         ctx.fillStyle = PLAYER_COLOUR;
         ctx.fillRect(data[i].x, data[i].y, 20, 20);
-      }
-});
+    }
+};

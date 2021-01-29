@@ -15,7 +15,7 @@
       integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW"
       crossorigin="anonymous"
     ></script>
-    <!-- <link rel="stylesheet" href="css/app.css" /> -->
+    <link rel="stylesheet" href="css/app.css" />
   </head>
   <body>
 
@@ -26,14 +26,14 @@
         <div class="form-group">
           <label for="username">Username</label>
           <input type="text" class="form-control"
-            id="signDiv-username" placeholder="joinPlayerNameInput Enter username"/>
+            id="playerUsername" placeholder="Enter username"/>
         </div>
       </div>
       <div class="col-6">
         <div class="form-group">
           <label for="gameCode">Game Code</label>
           <input type="text" class="form-control"
-            id="signDiv-password" placeholder="joinGameCodeInput Enter game code"/>
+            id="gameCode" placeholder="Enter game code"/>
         </div>
       </div>
     </div>
@@ -41,12 +41,12 @@
     <br />
     <div class="row">
       <div class="col-6">
-        <button class="btn btn-primary" id="signDiv-signIn">
+        <button class="btn btn-primary" disabled id="joinGameButton">
           Enter in room
         </button>
       </div>
       <div class="col-6">
-        <button  class="btn btn-success" id="signDiv-signUp">
+        <button  class="btn btn-success" id="newGameButton">
           Create game
         </button>
       </div>
@@ -73,18 +73,30 @@
     <!-- end game div -->
     
     <!-- Winner section -->
-    <div id="winDiv" style="display:none" class="container-fluid">
+    <div id="winScreen" style="display:none" class="container-fluid">
       <h1 id="win">PLayer</h1>
-      <button class="btn btn-success">New Game</button>
+      <button class="btn btn-success" id="ResetButton">New Game</button>
     </div>
     
 <!-- end winner section -->
-<div id="roomStandDiv" style="display:none" class="container-fluid">
-  <h1 id="roomStand"></h1>
-</div>
-<!-- sale d'attente -->
 
-<!-- end sale d'attente -->
+<!-- Waiting room -->
+<div id="waitingRoom" style="display:none" class="container-fluid">
+  <h1 id="waiting"></h1>
+</div>
+<!-- end Waiting room -->
+
+<!-- Started game -->
+<div id="gameStartedDiv" style="display:none" class="container-fluid">
+  <h1 id="gameStarted"></h1>
+</div>
+<!-- end Started game -->
+
+<!-- Game Code -->
+<div id="gameCodeDisplay" style="display:none" class="container-fluid">
+  <h1 id="code"></h1>
+</div>
+<!-- Game code -->
 <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
 <script type="text/javascript" src="js/index.js"></script>
     <!-- <button onclick="happy()">happy</button> -->

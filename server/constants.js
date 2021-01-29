@@ -52,7 +52,7 @@ class Player {
     }
 
 }
-var verifyWin = function (circles, WINNER, PLAYER_LIST, SOCKET_LIST,pack) {
+var verifyWin = function (circles, WINNER, PLAYER_LIST, SOCKET_LIST, pack) {
     if (Object.keys(circles).length === 18) {
         for (const key in PLAYER_LIST) {
             if (Math.max(...Object.values(WINNER)) === PLAYER_LIST[key].score) {
@@ -61,17 +61,33 @@ var verifyWin = function (circles, WINNER, PLAYER_LIST, SOCKET_LIST,pack) {
                     var socket = SOCKET_LIST[i];
                     socket.emit('winner', PLAYER_LIST[key].number);
                 }
-                
-                    for (i=0;i<pack.length;i++) {
-                        delete pack[i];  
-                    } 
-                    // socket.emit('winner', PLAYER_LIST[key].number);
-                
+
+                // for (i=0;i<pack.length;i++) {
+                pack = [];
+                // }
+                return true;
+                // socket.emit('winner', PLAYER_LIST[key].number);
+
             }
         }
     }
 
 }
+function sendDataToClient(SOCKET_LIST, pack) {
+    for (var i in SOCKET_LIST) {
+        var socket = SOCKET_LIST[i];
+        socket.emit('newPositions', pack);
+    }
+}
+
+function updateClientFrame(PLAYER_LIST,WINNER,circles,pack){
+    for (var i in PLAYER_LIST) {
+        var player = PLAYER_LIST[i];
+        player.updatePosition(circles);
+        player.updateState(WINNER,circles,pack,i);
+    }
+}
+
 var position = new Array(48).fill(1).map((_, i) => i * 10);
 var generateBall = function (BALLS) {
 
@@ -89,5 +105,5 @@ var generateBall = function (BALLS) {
     }
     return BALLS;
 };
-module.exports = { Circle, Player,verifyWin,generateBall }
+module.exports = { Circle, Player, verifyWin, generateBall,sendDataToClient,updateClientFrame }
 
