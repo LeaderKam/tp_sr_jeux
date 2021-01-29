@@ -1,9 +1,5 @@
-// const BG_COLOUR = '#faebd7';
-// const PLAYER_COLOUR = '#' + (Math.random() * 0xFFFFFF << 0).toString(16);
-// const CIRCLES_COLOUR = 'red';
-
-// const socket = io('https://cdn.socket.io/socket.io-1.4.5.js');
-
+const {BG_COLOUR, PLAYER_COLOUR, CIRCLES_COLOUR}=require('./constantClient');
+const {paintGame,drawPlayer,drawCircle}=require("./gameClientSide");
 // socket.on('init', handleInit);
 // socket.on('gameState', handleGameState);
 // socket.on('gameOver', handleGameOver);
@@ -21,6 +17,7 @@
 
 // newGameBtn.addEventListener('click', newGame);
 // joinGameBtn.addEventListener('click', joinGame);
+// window.onbeforeunload = function () {return false;}
 
 var ctx = document.getElementById("ctx").getContext("2d");
 ctx.font = "30px Arial";
@@ -31,73 +28,88 @@ var socket = io();
 // });
 // }
 
-var signDiv = document.getElementById("signDiv");
-var joinPlayerNameInput = document.getElementById("joinPlayerNameInput");
-var enterRoomBtn = document.getElementById("enterRoomBtn");
-var newGameBtn = document.getElementById("newGameBtn");
-var joinGameCodeInput = document.getElementById("joinGameCodeInput");
+//sign
+var initialScreen = document.getElementById('initialScreen');
+var roomStandDiv = document.getElementById('roomStandDiv');
+var winDiv = document.getElementById('winDiv');
+var signDivUsername = document.getElementById('signDiv-username');
+var signDivSignIn = document.getElementById('signDiv-signIn');
+var signDivSignUp = document.getElementById('signDiv-signUp');
+var signDivPassword = document.getElementById('signDiv-password');
+
+signDivSignIn.onclick = function(){
+    alert('bien');
+    socket.emit('signIn',{username:signDivUsername.value,password:signDivPassword.value});
+}
+signDivSignUp.onclick = function(){
+    socket.emit('signUp',{username:signDivUsername.value,password:signDivPassword.value});
+}
+socket.on('signInResponse',function(data){
+    if(data.success){
+        initialScreen.style.display = 'none';
+        gameScreen.style.display = 'none';
+        roomStandDiv.style.display="inline-block";
+        roomStand.innerHTML= "Attente d'autre joyeur";
+    } else
+        alert("Sign in unsuccessul.");
+});
+socket.on('signUpResponse',function(data){
+    if(data.success){
+        alert("Sign up successul.");
+    } else
+        alert("Sign up unsuccessul.");
+});
+
+//game
+var ctx = document.getElementById("ctx").getContext("2d");
+ctx.font = '30px Arial';
+
+// var signDiv = document.getElementById("signDiv");
+// var joinPlayerNameInput = document.getElementById("joinPlayerNameInput");
+// var enterRoomBtn = document.getElementById("enterRoomBtn");
+// var newGameBtn = document.getElementById("newGameBtn");
+// var joinGameCodeInput = document.getElementById("joinGameCodeInput");
 var playerScore = document.getElementById("score");
 var playerName = document.getElementById("playerName")
 
-enterRoomBtn.onclick = function () {
-    socket.emit("joinGame", {
-        username: signDivUsername.value,
-        password: signDivPassword.value,
-    });
-};
-newGameBtn.onclick = function () {
-    socket.emit("newGame", {
-        username: joinPlayerNameInput.value,
-        success:true
-        // password: signDivPassword.value,
-    });
-};
-socket.on("signInResponse", function (data) {
-    if (data.success) {
-        signDiv.style.display = "none";
-        gameDiv.style.display = "inline-block";
-    } else alert("Sign in unsuccessul.");
-});
-socket.on("newGameResponse", function (data) {
-    if (data.success) {
-        alert("new game successul created");
-        signDiv.style.display = "none";
-        gameDiv.style.display = "block";
-    } else alert("Sign up unsuccessul.");
-});
+// enterRoomBtn.onclick = function () {
+//     socket.emit("joinGame", {
+//         username: signDivUsername.value,
+//         password: signDivPassword.value,
+//     });
+// };
+// newGameBtn.onclick = function () {
+//     socket.emit("newGame", {
+//         username: joinPlayerNameInput.value,
+//         success:true
+//         // password: signDivPassword.value,
+//     });
+// };
+// socket.on("signInResponse", function (data) {
+//     if (data.success) {
+//         signDiv.style.display = "none";
+//         gameScreen.style.display = "inline-block";
+//     } else alert("Sign in unsuccessul.");
+// });
+// socket.on("newGameResponse", function (data) {
+//     if (data.success) {
+//         alert("new game successul created");
+//         initialScreen.style.display = "none";
+//         gameScreen.style.display = "inline-block";
+//     } else alert("Sign up unsuccessul.");
+// });
 
 socket.on("winner", function (data) {
-    signDiv.style.display = "block";
-    gameDiv.style.display = "none";
+    initialScreen.style.display = "none";
+    gameScreen.style.display = "none";
+    winDiv.style.display = "block";
+    win.innerHTML="Player " +data +" won";
 })
-// socket.on("newPositions", function (data) {
-//   newGame(data);
-//   // ctx.clearRect(0, 0, 500, 500);
-
-// for (var i = 0; i < data.length; i++) {
-//   // console.log(data[i].score);
-//   playerName.value=data[i].number;
-//   playerScore.value=data[i].score;
-
-//   for (var e in data[i].balls) {
-//     ctx.beginPath();
-
-//     ctx.arc(
-//       data[i].balls[e].x,
-//       data[i].balls[e].y,
-//       data[i].balls[e].radius,
-//       data[i].balls[e].start,
-//       data[i].balls[e].angle,
-//       false
-//     );
-//     ctx.stroke();
-//     ctx.fillStyle = "#FF4422";
-//     ctx.fill();
-//   }
-//   ctx.fillStyle = "#000000";
-//   ctx.fillRect(data[i].x, data[i].y, 20, 20);
-// }
-// });
+socket.on("start",function(){
+    initialScreen.style.display = "none";
+    gameScreen.style.display = "inline-block";
+    roomStandDiv.style.display="none";
+});
 
 document.onkeydown = function (event) {
     if (event.keyCode === 68 || event.keyCode === 39)
@@ -132,7 +144,7 @@ function newGame(data) {
     ctx.clearRect(0, 0, 500, 500);
 
     for (var i = 0; i < data.length; i++) {
-        // console.log(data[i].score);
+        console.log(data[i].score);
         playerName.value = data[i].number;
         playerScore.value = data[i].score;
 
@@ -160,27 +172,28 @@ socket.on("newPositions", function (data) {
     // newGame(data);
     ctx.clearRect(0, 0, 500, 500);
 
+    // paintGame(playerName, playerScore, data,ctx);
     for (var i = 0; i < data.length; i++) {
-        // console.log(data[i].score);
+        console.log(data[i].score);
         playerName.value = data[i].number;
         playerScore.value = data[i].score;
-
+    
         for (var e in data[i].balls) {
-            ctx.beginPath();
-
-            ctx.arc(
-                data[i].balls[e].x,
-                data[i].balls[e].y,
-                data[i].balls[e].radius,
-                data[i].balls[e].start,
-                data[i].balls[e].angle,
-                false
-            );
-            ctx.stroke();
-            ctx.fillStyle = "#FF4422";
-            ctx.fill();
+          ctx.beginPath();
+    
+          ctx.arc(
+            data[i].balls[e].x,
+            data[i].balls[e].y,
+            data[i].balls[e].radius,
+            data[i].balls[e].start,
+            data[i].balls[e].angle,
+            false
+          );
+          ctx.stroke();
+          ctx.fillStyle = CIRCLES_COLOUR;
+          ctx.fill();
         }
-        ctx.fillStyle = "#000000";
+        ctx.fillStyle = PLAYER_COLOUR;
         ctx.fillRect(data[i].x, data[i].y, 20, 20);
-    }
+      }
 });
