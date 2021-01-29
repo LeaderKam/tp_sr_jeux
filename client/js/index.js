@@ -48,10 +48,10 @@ var gameScreen = document.getElementById('gameScreen');
 
 
 joinGameBtn.onclick = function () {
-    socket.emit('join', { username: playerUsername.value, password: gameCode.value });
+    socket.emit('join', {password: gameCode.value });
 }
 newGameBtn.onclick = function () {
-    socket.emit('newGame', { username: playerUsername.value, password: gameCode.value });
+    socket.emit('newGame', {password: gameCode.value });
 }
 resetBtn.onclick = function () {
     socket.emit('reset');

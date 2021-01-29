@@ -8,6 +8,9 @@
     "nodemon": "^2.0.6",
     "socket.io": "^2.3.0"
   },
+  "engines": {
+    "node": "14.15.x"
+  },
   "devDependencies": {},
   "scripts": {
     "start": "nodemon app.js",
