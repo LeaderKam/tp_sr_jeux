@@ -68,6 +68,15 @@ class Player {
     //     delete PLAYER_LIST[socket.id];
     // }
 }
+function verifyKeyPressed(SOCKET_LIST,gameActive){
+    if (!gameActive) {
+        for (var i in SOCKET_LIST) {
+            var socket = SOCKET_LIST[i];
+            socket.emit("start");
+        }
+        gameActive = true;
+    }
+}
 var verifyWin = function (circles, WINNER, PLAYER_LIST, SOCKET_LIST, pack) {
     if (Object.keys(circles).length === 0) {
         for (const key in PLAYER_LIST) {
@@ -119,5 +128,5 @@ var generateBall = function (BALLS) {
     }
     return BALLS;
 };
-module.exports = { Circle, Player, verifyWin, generateBall, sendDataToClient, updateClientFrame }
+module.exports = { Circle, Player, verifyWin, generateBall, sendDataToClient, updateClientFrame,verifyKeyPressed }
 

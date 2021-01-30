@@ -28,10 +28,10 @@ var gameScreen = document.getElementById('gameScreen');
 
 
 joinGameBtn.onclick = function () {
-    socket.emit('join', {password: gameCode.value });
+    socket.emit('join', { password: gameCode.value });
 }
 newGameBtn.onclick = function () {
-    socket.emit('newGame', {password: gameCode.value });
+    socket.emit('newGame', { password: gameCode.value });
 }
 resetBtn.onclick = function () {
     socket.emit('reset');
@@ -44,9 +44,9 @@ function joinResponse(data) {
         initialScreen.style.display = 'none';
         gameScreen.style.display = 'none';
         waitingRoom.style.display = "inline-block";
-        waiting.innerHTML = "Waiting other players";
-        newGameBtn.disabled=false;
-        joinGameBtn.disabled=true;
+        waiting.innerHTML = "Waiting for other players, press button if you want to begin";
+        newGameBtn.disabled = false;
+        joinGameBtn.disabled = true;
     } else
         alert("Please reload the page.");
 };
@@ -56,18 +56,18 @@ function newGameResponse(data) {
         initialScreen.style.display = 'none';
         gameScreen.style.display = 'none';
         waitingRoom.style.display = "inline-block";
-        waiting.innerHTML = "Wait for players or start";
-        newGameBtn.disabled=true;
-        joinGameBtn.disabled=false;
+        waiting.innerHTML = "Wait for players or start by pressing button";
+        newGameBtn.disabled = true;
+        joinGameBtn.disabled = false;
     } else
         alert("Please join with code, Game has been created");
 };
 
-socket.on('disableBtn',function(data){
-    newGameBtn.disabled=true;
-    joinGameBtn.disabled=false;
-    gameCodeDisplay.style.display="block";
-    gameCodeDisplay.innerHTML="Code : "+data;
+socket.on('disableBtn', function (data) {
+    newGameBtn.disabled = true;
+    joinGameBtn.disabled = false;
+    gameCodeDisplay.style.display = "block";
+    gameCodeDisplay.innerHTML = "Code : " + data;
 });
 //game
 var ctx = document.getElementById("ctx").getContext("2d");
@@ -80,7 +80,6 @@ var playerName = document.getElementById("playerName")
 function winner(data) {
     initialScreen.style.display = "none";
     gameScreen.style.display = "none";
-    gameCodeDisplay.style.display="none";
     winScreen.style.display = "block";
     win.innerHTML = "Player " + data + " won";
 };
@@ -90,13 +89,15 @@ function start() {
     initialScreen.style.display = "none";
     gameScreen.style.display = "block";
     waitingRoom.style.display = "none";
-    gameCodeDisplay.style.display= "none";
 };
 
 document.onkeydown = function (event) {
     if (event.keyCode === 68 || event.keyCode === 39)
         //d
         socket.emit("keyPress", { inputId: "right", state: true });
+    else if (event.keyCode === 116)
+        //d
+        window.close();
     else if (event.keyCode === 83 || event.keyCode === 40)
         //s
         socket.emit("keyPress", { inputId: "down", state: true });
@@ -128,17 +129,17 @@ function resetGame() {
     gameCode.value = '';
     initialScreen.style.display = "block";
     gameScreen.style.display = "none";
-    winScreen.style.display="none";
-    gameCodeDisplay.style.display="none";
-    joinGameBtn.disabled=false;
-    newGameBtn.disabled=false;
+    winScreen.style.display = "none";
+    gameCodeDisplay.style.display = "none";
+    joinGameBtn.disabled = false;
+    newGameBtn.disabled = false;
     window.location.reload(false); //reload page automatically
 }
 
 // to know if game has started or not
 function gameStarted() {
     waitingRoom.style.display = "inline-block";
-    initialScreen.style.display= "none";
+    initialScreen.style.display = "none";
     waiting.innerHTML = "The Game has started";
 
 };
@@ -171,7 +172,7 @@ function newPositions(data) {
             ctx.fillStyle = CIRCLES_COLOUR;
             ctx.fill();
         }
-       //paint Player
+        //paint Player
         ctx.fillStyle = data[i].color;
         ctx.fillRect(data[i].x, data[i].y, 20, 20);
     }

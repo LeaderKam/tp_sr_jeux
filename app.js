@@ -34,7 +34,8 @@ Player.onDisconnect = function (socket) {
 }
 
 io.sockets.on('connection', function (socket) {
-
+    socket.id = Math.random();
+    SOCKET_LIST[socket.id] = socket;
     //verify if game has already begin
     if (gameActive) {
         socket.emit("gameStarted");
@@ -46,12 +47,12 @@ io.sockets.on('connection', function (socket) {
     }
 
     //client number and new Player or client creation
-    socket.id = Math.random();
+    
     var PLAYER_COLOUR = (Math.random() * 0xFFFFFF << 0).toString(16);
     var player = new Player(socket.id);
     player.color = player.color + PLAYER_COLOUR;
 
-    SOCKET_LIST[socket.id] = socket;
+    
 
     console.log(Object.keys(SOCKET_LIST).length + " client");
     socket.on('join', function (data) {
@@ -94,7 +95,7 @@ io.sockets.on('connection', function (socket) {
 
     socket.on('keyPress', function (data) {
         if (!gameActive) {
-            for (var i in SOCKET_LIST) {
+            for (var i in PLAYER_LIST) {
                 var socket = SOCKET_LIST[i];
                 socket.emit("start");
             }
@@ -125,7 +126,7 @@ function initGame(socket, player) {
 setInterval(function () {
     var pack = [];
     updateClientFrame(PLAYER_LIST, WINNER, circles, pack);
-    if (Object.keys(SOCKET_LIST).length === 0) {
+    if (Object.keys(PLAYER_LIST).length === 0) {
         gameActive = false;
         newGameDisableBtn = false;
         initialized = false;
