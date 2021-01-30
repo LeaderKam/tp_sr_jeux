@@ -95,6 +95,7 @@ function start() {
     initialScreen.style.display = "none";
     gameScreen.style.display = "block";
     waitingRoom.style.display = "none";
+    gameCodeDisplay.style.display= "none";
 };
 
 document.onkeydown = function (event) {

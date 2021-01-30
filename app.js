@@ -147,6 +147,9 @@ var WINNER = {}
 setInterval(function () {
     var pack = [];
     updateClientFrame(PLAYER_LIST, WINNER, circles, pack);
+    if(PLAYER_LIST.length==0){
+        gameActive=false;
+    };
     if (verifyWin(circles, WINNER, PLAYER_LIST, SOCKET_LIST, pack)) return;
     sendDataToClient(SOCKET_LIST, pack);
 }, 1000 / 25);
