@@ -95,9 +95,6 @@ document.onkeydown = function (event) {
     if (event.keyCode === 68 || event.keyCode === 39)
         //d
         socket.emit("keyPress", { inputId: "right", state: true });
-    else if (event.keyCode === 116)
-        //d
-        window.close();
     else if (event.keyCode === 83 || event.keyCode === 40)
         //s
         socket.emit("keyPress", { inputId: "down", state: true });
