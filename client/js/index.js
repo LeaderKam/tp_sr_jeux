@@ -1,6 +1,6 @@
 // var {BG_COLOUR,PLAYER_COLOUR,CIRCLES_COLOUR} = require('./constantClient');
 var BG_COLOUR = '#faebd7';
-var PLAYER_COLOUR = '#' + (Math.random() * 0xFFFFFF << 0).toString(16);
+// var PLAYER_COLOUR = '#' + (Math.random() * 0xFFFFFF << 0).toString(16);
 var CIRCLES_COLOUR = 'red';
 // var {paintGame,drawPlayer,drawCircle} = require("./gameClientSide");
 var socket = io();
@@ -151,7 +151,7 @@ function newPositions(data) {
     // paintGame(playerName, playerScore, data,ctx);
     if (data[0] == null) return;
     for (var i = 0; i < data.length; i++) {
-        console.log(data[i]);
+        
         playerName.value = data[i].number;
         playerScore.value = data[i].score;
 
@@ -170,7 +170,8 @@ function newPositions(data) {
             ctx.fillStyle = CIRCLES_COLOUR;
             ctx.fill();
         }
-        ctx.fillStyle = PLAYER_COLOUR;
+        console.log(data[i].color);
+        ctx.fillStyle = data[i].color;
         ctx.fillRect(data[i].x, data[i].y, 20, 20);
     }
 };

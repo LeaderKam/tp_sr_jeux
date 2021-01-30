@@ -23,6 +23,7 @@ class Player {
         this.pressingDown = false;
         this.maxSpd = 10;
         this.score = 0;
+        this.color = '#';
     }
     updatePosition(circles) {
         if (this.pressingRight)
@@ -46,6 +47,7 @@ class Player {
             y: this.y,
             number: this.number,
             score: this.score,
+            color: this.color,
             balls: circles
         });
         WINNER[i] = this.score

@@ -69,8 +69,9 @@ io.sockets.on('connection', function (socket) {
 
     //client number and new Player or client creation
     socket.id = Math.random();
+    var PLAYER_COLOUR = (Math.random() * 0xFFFFFF << 0).toString(16);
     var player = new Player(socket.id);
-
+    player.color=player.color+PLAYER_COLOUR;
     socket.on('join', function (data) {
         if (!initialized) return;
         isValidPassword(data, code, function (res) {
