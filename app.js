@@ -91,8 +91,8 @@ io.sockets.on('connection', function (socket) {
         });
     });
     socket.on('newGame', function (data) {
-        // newGame();
-        if (initialized) return;
+        
+        if (initialized) {socket.emit('newGameResponse', { success: false }); return;}
         initGame(socket, player);
         Player.onConnect(socket);
         newGameDisableBtn = true;

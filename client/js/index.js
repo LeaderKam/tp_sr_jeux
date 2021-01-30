@@ -44,11 +44,11 @@ function joinResponse(data) {
         initialScreen.style.display = 'none';
         gameScreen.style.display = 'none';
         waitingRoom.style.display = "inline-block";
-        waiting.innerHTML = "Attente d'autre joueur";
+        waiting.innerHTML = "Waiting other players";
         newGameBtn.disabled=false;
         joinGameBtn.disabled=true;
     } else
-        alert("Sign in unsuccessul.");
+        alert("Please reload the page.");
 };
 
 function newGameResponse(data) {
@@ -56,12 +56,12 @@ function newGameResponse(data) {
         initialScreen.style.display = 'none';
         gameScreen.style.display = 'none';
         waitingRoom.style.display = "inline-block";
-        waiting.innerHTML = "Attente d'autre joyeur";
+        waiting.innerHTML = "Wait for players or start";
         newGameBtn.disabled=true;
         joinGameBtn.disabled=false;
         // window.location.reload(false);
     } else
-        alert("new Game unsuccessul.");
+        alert("Please join with code, Game has been created");
 };
 
 socket.on('disableBtn',function(data){
