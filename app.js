@@ -1,7 +1,7 @@
 var PORT = 2000;
 var express = require('express');
 var { Player, verifyWin, generateBall, sendDataToClient, updateClientFrame } = require('./server/constants');
-var { isValidPassword } = require('./server/connection');
+var isValidCode = require('./server/connection');
 var app = express();
 var server = require('http').Server(app);
 
@@ -29,10 +29,7 @@ newGameDisableBtn = false;
 var gameActive = false; //to know if game has started
 var initialized = false; //to know if new game is created
 
-Player.onDisconnect = function (socket) {
-    delete PLAYER_LIST[socket.id];
-}
-
+//handle client connection
 io.sockets.on('connection', function (socket) {
     socket.id = Math.random();
     SOCKET_LIST[socket.id] = socket;
@@ -46,17 +43,13 @@ io.sockets.on('connection', function (socket) {
         socket.emit('disableBtn', code);
     }
 
-    //client number and new Player or client creation
-    
     var PLAYER_COLOUR = (Math.random() * 0xFFFFFF << 0).toString(16);
     var player = new Player(socket.id);
     player.color = player.color + PLAYER_COLOUR;
 
-    
-
     console.log(Object.keys(SOCKET_LIST).length + " client");
     socket.on('join', function (data) {
-        isValidPassword(data, code, function (res) {
+        isValidCode(data, code, function (res) {
             if (res) {
                 PLAYER_LIST[socket.id] = player;
                 player.onConnect(socket);
@@ -68,6 +61,8 @@ io.sockets.on('connection', function (socket) {
             }
         });
     });
+
+    //listen to the client ti know if he want to create new game
     socket.on('newGame', function (data) {
         if (initialized) { socket.emit('newGameResponse', { success: false }); return; }
         initGame(socket, player);
@@ -76,6 +71,8 @@ io.sockets.on('connection', function (socket) {
         socket.emit('newGameResponse', { success: true });
         console.log(Object.keys(PLAYER_LIST).length + " number of player");
     });
+
+    //listen to the client if if want to reset(replay) game
     socket.on('reset', function (data) {
         newGameDisableBtn = false;
         gameActive = false;
@@ -86,6 +83,7 @@ io.sockets.on('connection', function (socket) {
         }
     });
 
+    //handle the client if any client his disconnect or not
     socket.on('disconnect', function () {
         delete SOCKET_LIST[socket.id]; //delete the client connection
         delete PLAYER_LIST[socket.id]; //delete player connection
@@ -93,7 +91,10 @@ io.sockets.on('connection', function (socket) {
         console.log(Object.keys(PLAYER_LIST).length + " player remaining");
     });
 
+    //listen the keypress from the client
     socket.on('keyPress', function (data) {
+        
+        //if game has started display it to all client screen
         if (!gameActive) {
             for (var i in PLAYER_LIST) {
                 var socket = SOCKET_LIST[i];
@@ -114,6 +115,8 @@ io.sockets.on('connection', function (socket) {
     });
 })
 var WINNER = {}
+
+//function to create new game
 function initGame(socket, player) {
     circles = generateBall(BALLS);
     SOCKET_LIST[socket.id] = socket;
@@ -123,6 +126,7 @@ function initGame(socket, player) {
     WINNER = {}
 }
 
+//reload frame all 1000/25 ms
 setInterval(function () {
     var pack = [];
     updateClientFrame(PLAYER_LIST, WINNER, circles, pack);

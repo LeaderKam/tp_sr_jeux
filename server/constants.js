@@ -1,4 +1,3 @@
-
 class Circle {
     constructor(id) {
         this.id = id;
@@ -8,7 +7,6 @@ class Circle {
         this.angle = Math.PI * 2;
         this.start = 0;
     }
-
 }
 
 class Player {
@@ -129,4 +127,3 @@ var generateBall = function (BALLS) {
     return BALLS;
 };
 module.exports = { Circle, Player, verifyWin, generateBall, sendDataToClient, updateClientFrame,verifyKeyPressed }
-

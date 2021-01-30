@@ -1,9 +1,8 @@
-// var {BG_COLOUR,PLAYER_COLOUR,CIRCLES_COLOUR} = require('./constantClient');
-var BG_COLOUR = '#faebd7';
-// var PLAYER_COLOUR = '#' + (Math.random() * 0xFFFFFF << 0).toString(16);
 var CIRCLES_COLOUR = 'red';
-// var {paintGame,drawPlayer,drawCircle} = require("./gameClientSide");
+
 var socket = io();
+
+//client listen link(callback function)
 socket.on("gameStarted", gameStarted);
 socket.on('joinResponse', joinResponse);
 socket.on('newGameResponse', newGameResponse);
@@ -12,9 +11,11 @@ socket.on("start", start);
 socket.on("newPositions", newPositions);
 socket.on("resetGame", resetGame);
 
+//game canvas
 var ctx = document.getElementById("ctx").getContext("2d");
 ctx.font = "30px Arial";
 
+//all div and button handle
 var initialScreen = document.getElementById('initialScreen');
 var waitingRoom = document.getElementById('waitingRoom');
 var winScreen = document.getElementById('winScreen');
@@ -25,7 +26,8 @@ var resetBtn = document.getElementById('ResetButton');
 var playerUsername = document.getElementById('playerUsername');
 var gameCode = document.getElementById('gameCode');
 var gameScreen = document.getElementById('gameScreen');
-
+var playerScore = document.getElementById("score");
+var playerName = document.getElementById("playerName")
 
 joinGameBtn.onclick = function () {
     socket.emit('join', { password: gameCode.value });
@@ -38,7 +40,7 @@ resetBtn.onclick = function () {
 }
 
 
-
+//function handle join(allow or not) from server
 function joinResponse(data) {
     if (data.success) {
         initialScreen.style.display = 'none';
@@ -51,6 +53,7 @@ function joinResponse(data) {
         alert("Please reload the page.");
 };
 
+//function to handle new game response from server
 function newGameResponse(data) {
     if (data.success) {
         initialScreen.style.display = 'none';
@@ -63,18 +66,13 @@ function newGameResponse(data) {
         alert("Please join with code, Game has been created");
 };
 
+//listen to the server to know if new game button is disabled
 socket.on('disableBtn', function (data) {
     newGameBtn.disabled = true;
     joinGameBtn.disabled = false;
     gameCodeDisplay.style.display = "block";
     gameCodeDisplay.innerHTML = "Code : " + data;
 });
-//game
-var ctx = document.getElementById("ctx").getContext("2d");
-ctx.font = '30px Arial';
-
-var playerScore = document.getElementById("score");
-var playerName = document.getElementById("playerName")
 
 //for know the winner
 function winner(data) {
@@ -84,7 +82,7 @@ function winner(data) {
     win.innerHTML = "Player " + data + " won";
 };
 
-//for know the game has started
+//for know if the game has started
 function start() {
     initialScreen.style.display = "none";
     gameScreen.style.display = "block";
@@ -99,10 +97,10 @@ document.onkeydown = function (event) {
         //s
         socket.emit("keyPress", { inputId: "down", state: true });
     else if (event.keyCode === 81 || event.keyCode === 37)
-        //a
+        //q
         socket.emit("keyPress", { inputId: "left", state: true });
     else if (event.keyCode === 90 || event.keyCode === 38)
-        //w
+        //z
         socket.emit("keyPress", { inputId: "up", state: true });
 };
 
@@ -114,10 +112,10 @@ document.onkeyup = function (event) {
         //s
         socket.emit("keyPress", { inputId: "down", state: false });
     else if (event.keyCode === 81 || event.keyCode === 37)
-        //a
+        //q
         socket.emit("keyPress", { inputId: "left", state: false });
     else if (event.keyCode === 90 || event.keyCode === 38)
-        //w
+        //z
         socket.emit("keyPress", { inputId: "up", state: false });
 };
 
