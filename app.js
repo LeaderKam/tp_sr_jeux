@@ -1,19 +1,17 @@
 var PORT = 2000;
 var express = require('express');
-var { Circle, Player, verifyWin, generateBall, sendDataToClient, updateClientFrame } = require('./server/constants');
-var { isValidPassword} = require('./server/connection');
+var { Player, verifyWin, generateBall, sendDataToClient, updateClientFrame } = require('./server/constants');
+var { isValidPassword } = require('./server/connection');
 var app = express();
 var server = require('http').Server(app);
 
 //communication with the file
 app.get('/', function (req, res) {
     res.sendFile(__dirname + '/client/index.html');
-
 });
 
 // help to have access to all resources in client directory in root "/"
 app.use('/', express.static(__dirname + '/client'));
-
 
 server.listen(process.env.PORT || PORT, () => console.log("listening on *:" + PORT));
 // app.use('/client', express.static(__dirname + '/client'));
@@ -31,32 +29,18 @@ newGameDisableBtn = false;
 var gameActive = false; //to know if game has started
 var initialized = false; //to know if new game is created
 
-Player.onConnect = function (socket) {
-    var player = new Player(socket.id);
-    socket.on('keyPress', function (data) {
-        if (data.inputId === 'left')
-            player.pressingLeft = data.state;
-        else if (data.inputId === 'right')
-            player.pressingRight = data.state;
-        else if (data.inputId === 'up')
-            player.pressingUp = data.state;
-        else if (data.inputId === 'down')
-            player.pressingDown = data.state;
-
-    });
-}
-
 Player.onDisconnect = function (socket) {
-    // delete Player.list[socket.id];
     delete PLAYER_LIST[socket.id];
 }
 
 io.sockets.on('connection', function (socket) {
 
+    //verify if game has already begin
     if (gameActive) {
         socket.emit("gameStarted");
         return;
     };
+    //verify if new game button is disable
     if (newGameDisableBtn) {
         socket.emit('disableBtn', code);
     }
@@ -68,33 +52,30 @@ io.sockets.on('connection', function (socket) {
     player.color = player.color + PLAYER_COLOUR;
 
     SOCKET_LIST[socket.id] = socket;
-                
+
+    console.log(Object.keys(SOCKET_LIST).length + " client");
     socket.on('join', function (data) {
-        
         isValidPassword(data, code, function (res) {
             if (res) {
                 PLAYER_LIST[socket.id] = player;
-                
-                
-                Player.onConnect(socket);
-                socket.emit('joinResponse', { success: true });
+                player.onConnect(socket);
 
+                socket.emit('joinResponse', { success: true });
+                console.log(Object.keys(PLAYER_LIST).length + " number of player");
             } else {
                 socket.emit('joinResponse', { success: false });
             }
         });
     });
     socket.on('newGame', function (data) {
-        
-        if (initialized) {socket.emit('newGameResponse', { success: false }); return;}
+        if (initialized) { socket.emit('newGameResponse', { success: false }); return; }
         initGame(socket, player);
-        Player.onConnect(socket);
+        player.onConnect(socket);
         newGameDisableBtn = true;
         socket.emit('newGameResponse', { success: true });
+        console.log(Object.keys(PLAYER_LIST).length + " number of player");
     });
     socket.on('reset', function (data) {
-        // newGame();
-        
         newGameDisableBtn = false;
         gameActive = false;
         initialized = false;
@@ -102,24 +83,25 @@ io.sockets.on('connection', function (socket) {
             var socket = SOCKET_LIST[i];
             socket.emit('resetGame');
         }
-        // PLAYER_LIST = {};
-        // SOCKET_LIST = {};
-        // WINNER={};
     });
 
     socket.on('disconnect', function () {
         delete SOCKET_LIST[socket.id]; //delete the client connection
         delete PLAYER_LIST[socket.id]; //delete player connection
-        console.log(Object.keys(SOCKET_LIST).length);
+        console.log(Object.keys(SOCKET_LIST).length + " client remaining");
+        console.log(Object.keys(PLAYER_LIST).length + " player remaining");
     });
 
     socket.on('keyPress', function (data) {
-        for (var i in SOCKET_LIST) {
-            var socket = SOCKET_LIST[i];
-            socket.emit("start");
+        if (!gameActive) {
+            for (var i in SOCKET_LIST) {
+                var socket = SOCKET_LIST[i];
+                socket.emit("start");
+            }
+            gameActive = true;
         }
 
-        gameActive = true;
+        
         if (data.inputId === 'left')
             player.pressingLeft = data.state
         if (data.inputId === 'right')
@@ -130,24 +112,23 @@ io.sockets.on('connection', function (socket) {
             player.pressingDown = data.state
     });
 })
-
+var WINNER = {}
 function initGame(socket, player) {
     circles = generateBall(BALLS);
     SOCKET_LIST[socket.id] = socket;
     PLAYER_LIST[socket.id] = player;
     initialized = true;
     code = Math.floor(Math.random() * 10);
+    WINNER = {}
 }
-
-var WINNER = {}
 
 setInterval(function () {
     var pack = [];
     updateClientFrame(PLAYER_LIST, WINNER, circles, pack);
     if (Object.keys(SOCKET_LIST).length === 0) {
         gameActive = false;
-        newGameDisableBtn=false;
-        initialized=false;
+        newGameDisableBtn = false;
+        initialized = false;
     };
     if (verifyWin(circles, WINNER, PLAYER_LIST, SOCKET_LIST, pack)) return;
     sendDataToClient(SOCKET_LIST, pack);

@@ -16,8 +16,8 @@ class Player {
         this.x = 250;
         this.y = 250;
         this.id = id;
-        this.number = "" + Math.floor(10 * Math.random()),
-            this.pressingRight = false;
+        this.number = "" + Math.floor(10 * Math.random());
+        this.pressingRight = false;
         this.pressingLeft = false;
         this.pressingUp = false;
         this.pressingDown = false;
@@ -52,7 +52,21 @@ class Player {
         });
         WINNER[i] = this.score
     }
-
+    onConnect(socket){
+        socket.on('keyPress', function (data) {
+            if (data.inputId === 'left')
+                this.pressingLeft = data.state;
+            else if (data.inputId === 'right')
+                this.pressingRight = data.state;
+            else if (data.inputId === 'up')
+                this.pressingUp = data.state;
+            else if (data.inputId === 'down')
+                this.pressingDown = data.state;
+        });
+    }
+    // onDisconnect(socket,PLAYER_LIST) {
+    //     delete PLAYER_LIST[socket.id];
+    // }
 }
 var verifyWin = function (circles, WINNER, PLAYER_LIST, SOCKET_LIST, pack) {
     if (Object.keys(circles).length === 0) {
@@ -63,6 +77,7 @@ var verifyWin = function (circles, WINNER, PLAYER_LIST, SOCKET_LIST, pack) {
                     socket.emit('winner', PLAYER_LIST[key].number);
                 }
                 pack = [];
+                WINNER={};
                 return true;
             }
         }
@@ -79,11 +94,11 @@ function sendDataToClient(SOCKET_LIST, pack) {
 }
 
 //function to update all Client frame
-function updateClientFrame(PLAYER_LIST,WINNER,circles,pack){
+function updateClientFrame(PLAYER_LIST, WINNER, circles, pack) {
     for (var i in PLAYER_LIST) {
         var player = PLAYER_LIST[i];
         player.updatePosition(circles);
-        player.updateState(WINNER,circles,pack,i);
+        player.updateState(WINNER, circles, pack, i);
     }
 }
 
@@ -104,5 +119,5 @@ var generateBall = function (BALLS) {
     }
     return BALLS;
 };
-module.exports = { Circle, Player, verifyWin, generateBall,sendDataToClient,updateClientFrame }
+module.exports = { Circle, Player, verifyWin, generateBall, sendDataToClient, updateClientFrame }
 

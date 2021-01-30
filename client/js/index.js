@@ -67,7 +67,7 @@ socket.on('disableBtn',function(data){
     newGameBtn.disabled=true;
     joinGameBtn.disabled=false;
     gameCodeDisplay.style.display="block";
-    gameCodeDisplay.innerHTML=data;
+    gameCodeDisplay.innerHTML="Code : "+data;
 });
 //game
 var ctx = document.getElementById("ctx").getContext("2d");
