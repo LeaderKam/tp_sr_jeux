@@ -55,25 +55,22 @@ class Player {
 
 }
 var verifyWin = function (circles, WINNER, PLAYER_LIST, SOCKET_LIST, pack) {
-    if (Object.keys(circles).length === 18) {
+    if (Object.keys(circles).length === 0) {
         for (const key in PLAYER_LIST) {
             if (Math.max(...Object.values(WINNER)) === PLAYER_LIST[key].score) {
                 for (var i in SOCKET_LIST) {
                     var socket = SOCKET_LIST[i];
                     socket.emit('winner', PLAYER_LIST[key].number);
                 }
-
-                // for (i=0;i<pack.length;i++) {
                 pack = [];
-                // }
                 return true;
-                // socket.emit('winner', PLAYER_LIST[key].number);
-
             }
         }
     }
 
 }
+
+//function to send Data to all client
 function sendDataToClient(SOCKET_LIST, pack) {
     for (var i in SOCKET_LIST) {
         var socket = SOCKET_LIST[i];
@@ -81,6 +78,7 @@ function sendDataToClient(SOCKET_LIST, pack) {
     }
 }
 
+//function to update all Client frame
 function updateClientFrame(PLAYER_LIST,WINNER,circles,pack){
     for (var i in PLAYER_LIST) {
         var player = PLAYER_LIST[i];

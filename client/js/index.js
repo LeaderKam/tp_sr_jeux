@@ -59,7 +59,6 @@ function newGameResponse(data) {
         waiting.innerHTML = "Wait for players or start";
         newGameBtn.disabled=true;
         joinGameBtn.disabled=false;
-        // window.location.reload(false);
     } else
         alert("Please join with code, Game has been created");
 };
@@ -74,11 +73,6 @@ socket.on('disableBtn',function(data){
 var ctx = document.getElementById("ctx").getContext("2d");
 ctx.font = '30px Arial';
 
-// var signDiv = document.getElementById("signDiv");
-// var joinPlayerNameInput = document.getElementById("joinPlayerNameInput");
-// var enterRoomBtn = document.getElementById("enterRoomBtn");
-// var newGameBtn = document.getElementById("newGameBtn");
-// var joinGameCodeInput = document.getElementById("joinGameCodeInput");
 var playerScore = document.getElementById("score");
 var playerName = document.getElementById("playerName")
 
@@ -129,8 +123,8 @@ document.onkeyup = function (event) {
         socket.emit("keyPress", { inputId: "up", state: false });
 };
 
+//reset game after player won
 function resetGame() {
-    // playerNumber = null;
     gameCode.value = '';
     initialScreen.style.display = "block";
     gameScreen.style.display = "none";
@@ -138,26 +132,30 @@ function resetGame() {
     gameCodeDisplay.style.display="none";
     joinGameBtn.disabled=false;
     newGameBtn.disabled=false;
-    window.location.reload(false);
+    window.location.reload(false); //reload page automatically
 }
 
+// to know if game has started or not
 function gameStarted() {
     waitingRoom.style.display = "inline-block";
     initialScreen.style.display= "none";
     waiting.innerHTML = "The Game has started";
 
 };
+
+//fonction to update player position
 function newPositions(data) {
-    // newGame(data);
+    //clear game screen
     ctx.clearRect(0, 0, 500, 500);
 
-    // paintGame(playerName, playerScore, data,ctx);
     if (data[0] == null) return;
+    //paint game
     for (var i = 0; i < data.length; i++) {
-        
-        playerName.value = data[i].number;
-        playerScore.value = data[i].score;
 
+        playerName.innerHTML = data[i].number;
+        playerScore.innerHTML = data[i].score;
+
+        //paint circles
         for (var e in data[i].balls) {
             ctx.beginPath();
 
