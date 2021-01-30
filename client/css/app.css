@@ -30,17 +30,16 @@ body{
 #winScreen, #waitingRoom {
     margin: 30vh 70vh;
     /* margin-top:500px; */
-    width: 80vh;
+    width: 60vh;
     height: 30vh;
     background-color: antiquewhite;
     border-radius: 20px;
     padding: 10px;
 }
 #gameCodeDisplay{
-    margin: 5vh 70vh;
+    margin: 5px 70vh;
     /* margin-top:500px; */
-    width: 60vh;
-    height: 30vh;
+    width: 10vh;
 
    border-radius: 20px;
     padding: 10px;

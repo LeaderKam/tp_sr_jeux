@@ -58,7 +58,6 @@ var verifyWin = function (circles, WINNER, PLAYER_LIST, SOCKET_LIST, pack) {
     if (Object.keys(circles).length === 18) {
         for (const key in PLAYER_LIST) {
             if (Math.max(...Object.values(WINNER)) === PLAYER_LIST[key].score) {
-                console.log(PLAYER_LIST[key].number + " win")
                 for (var i in SOCKET_LIST) {
                     var socket = SOCKET_LIST[i];
                     socket.emit('winner', PLAYER_LIST[key].number);

@@ -28,8 +28,8 @@ var circles = {};
 var BALLS = {};
 var code = 0;
 newGameDisableBtn = false;
-var gameActive = false;
-var initialized = false;
+var gameActive = false; //to know if game has started
+var initialized = false; //to know if new game is created
 // function newGame(){
 //     SOCKET_LIST = {};
 //     PLAYER_LIST = {};
@@ -71,16 +71,17 @@ io.sockets.on('connection', function (socket) {
     socket.id = Math.random();
     var PLAYER_COLOUR = (Math.random() * 0xFFFFFF << 0).toString(16);
     var player = new Player(socket.id);
-    player.color=player.color+PLAYER_COLOUR;
+    player.color = player.color + PLAYER_COLOUR;
+
+    SOCKET_LIST[socket.id] = socket;
+                
     socket.on('join', function (data) {
-        if (!initialized) return;
+        
         isValidPassword(data, code, function (res) {
             if (res) {
-                socket.id = Math.random();
-                SOCKET_LIST[socket.id] = socket;
-
-                console.log(Object.keys(SOCKET_LIST).length);
                 PLAYER_LIST[socket.id] = player;
+                
+                
                 Player.onConnect(socket);
                 socket.emit('joinResponse', { success: true });
 
@@ -91,19 +92,30 @@ io.sockets.on('connection', function (socket) {
     });
     socket.on('newGame', function (data) {
         // newGame();
+        if (initialized) return;
         initGame(socket, player);
         Player.onConnect(socket);
         newGameDisableBtn = true;
+        // for (var i in SOCKET_LIST) {
+        //     var socket = SOCKET_LIST[i];
+        //     // socket.emit('newGameResponse', { success: true });
+        // }
+        
         socket.emit('newGameResponse', { success: true });
     });
     socket.on('reset', function (data) {
         // newGame();
-        PLAYER_LIST={};
-        SOCKET_LIST={};
+        
         newGameDisableBtn = false;
-        gameActive=false;
-        initialized=false;
-        socket.emit('resetGame');
+        gameActive = false;
+        initialized = false;
+        for (var i in SOCKET_LIST) {
+            var socket = SOCKET_LIST[i];
+            socket.emit('resetGame');
+        }
+        // PLAYER_LIST = {};
+        // SOCKET_LIST = {};
+        // WINNER={};
     });
 
     socket.on('disconnect', function () {
@@ -114,7 +126,11 @@ io.sockets.on('connection', function (socket) {
     });
 
     socket.on('keyPress', function (data) {
-        socket.emit("start");
+        for (var i in SOCKET_LIST) {
+            var socket = SOCKET_LIST[i];
+            socket.emit("start");
+        }
+
         gameActive = true;
         if (data.inputId === 'left')
             player.pressingLeft = data.state
@@ -126,12 +142,11 @@ io.sockets.on('connection', function (socket) {
             player.pressingDown = data.state
     });
 })
-function reset(){
+function reset() {
 
 }
 function initGame(socket, player) {
-    SOCKET_LIST = {};
-    PLAYER_LIST = {};
+
     circles = generateBall(BALLS);
 
     SOCKET_LIST[socket.id] = socket;
@@ -147,9 +162,13 @@ var WINNER = {}
 setInterval(function () {
     var pack = [];
     updateClientFrame(PLAYER_LIST, WINNER, circles, pack);
-    if(PLAYER_LIST.length==0){
-        gameActive=false;
+    if (Object.keys(SOCKET_LIST).length === 0) {
+        gameActive = false;
+        newGameDisableBtn=false;
+        initialized=false;
     };
+    console.log(Object.keys(SOCKET_LIST).length);
+    console.log(Object.keys(PLAYER_LIST).length);
     if (verifyWin(circles, WINNER, PLAYER_LIST, SOCKET_LIST, pack)) return;
     sendDataToClient(SOCKET_LIST, pack);
 }, 1000 / 25);

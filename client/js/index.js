@@ -59,6 +59,7 @@ function newGameResponse(data) {
         waiting.innerHTML = "Attente d'autre joyeur";
         newGameBtn.disabled=true;
         joinGameBtn.disabled=false;
+        // window.location.reload(false);
     } else
         alert("new Game unsuccessul.");
 };
@@ -137,12 +138,13 @@ function resetGame() {
     gameCodeDisplay.style.display="none";
     joinGameBtn.disabled=false;
     newGameBtn.disabled=false;
+    window.location.reload(false);
 }
 
 function gameStarted() {
     waitingRoom.style.display = "inline-block";
     initialScreen.style.display= "none";
-    waiting.innerHTML = "The Game has allready started";
+    waiting.innerHTML = "The Game has started";
 
 };
 function newPositions(data) {
@@ -171,7 +173,7 @@ function newPositions(data) {
             ctx.fillStyle = CIRCLES_COLOUR;
             ctx.fill();
         }
-        console.log(data[i].color);
+       //paint Player
         ctx.fillStyle = data[i].color;
         ctx.fillRect(data[i].x, data[i].y, 20, 20);
     }
