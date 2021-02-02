@@ -129,7 +129,7 @@ function resetGame() {
     gameCodeDisplay.style.display = "none";
     joinGameBtn.disabled = false;
     newGameBtn.disabled = false;
-    // window.location.reload(false); //reload page automatically
+    window.location.reload(false); //reload page automatically
 }
 
 // to know if game has started or not
