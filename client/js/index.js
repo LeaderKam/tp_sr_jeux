@@ -27,7 +27,8 @@ var playerUsername = document.getElementById('playerUsername');
 var gameCode = document.getElementById('gameCode');
 var gameScreen = document.getElementById('gameScreen');
 var playerScore = document.getElementById("playerScore");
-var playerName = document.getElementById("playerName")
+var playerName = document.getElementById("playerName");
+var info = document.getElementById("info");
 
 joinGameBtn.onclick = function () {
     socket.emit('join', { password: gameCode.value });
@@ -46,7 +47,7 @@ function joinResponse(data) {
         initialScreen.style.display = 'none';
         gameScreen.style.display = 'none';
         waitingRoom.style.display = "inline-block";
-        waiting.innerHTML = "Waiting for other players, press button if you want to begin, Player:"+data.number;
+        waiting.innerHTML = "Waiting for other players, press button if you want to begin, Player:" + data.number;
         newGameBtn.disabled = false;
         joinGameBtn.disabled = true;
     } else
@@ -59,7 +60,7 @@ function newGameResponse(data) {
         initialScreen.style.display = 'none';
         gameScreen.style.display = 'none';
         waitingRoom.style.display = "inline-block";
-        waiting.innerHTML = "Wait for players or start by pressing button, Player :"+data.number;
+        waiting.innerHTML = "Wait for players or start by pressing button, Player :" + data.number;
         newGameBtn.disabled = true;
         joinGameBtn.disabled = false;
     } else
@@ -146,13 +147,13 @@ function newPositions(data) {
 
     if (data[0] == null) return;
     //paint game
-    
+    info.innerHTML="";
     for (var i = 0; i < data.length; i++) {
         //paint Player
- ctx.fillStyle = data[i].color;
- ctx.fillRect(data[i].x, data[i].y, 20, 20);
-        
-        console.log(data[i].number+ " "+ data[i].score);
+        ctx.fillStyle = data[i].color;
+        ctx.fillRect(data[i].x, data[i].y, 20, 20);
+
+        console.log(data[i].number + " " + data[i].score);
         //paint circles
         for (var e in data[i].balls) {
             ctx.beginPath();
@@ -168,8 +169,17 @@ function newPositions(data) {
             ctx.stroke();
             ctx.fillStyle = CIRCLES_COLOUR;
             ctx.fill();
+            
         }
-        playerName.innerHTML = data[i].number;
-        playerScore.innerHTML = data[i].score;
+        
+        info.innerHTML += '<div id='+data[i].number+'></div>'
+        document.getElementById(""+data[i].number).innerHTML='id: '  +data[i].number+' Score: '+data[i].score
+        // playerName.id = data[i].number;
+        // document.getElementById(""+data[i].number).innerHTML=data[i].number;
+        // playerName.innerHTML=data[i].number;
+        // playerScore.id = data[i].score;
+        // document.getElementById(""+data[i].score).innerHTML=data[i].score;
+        // playerScore.innerHTML = data[i].score;
     }
+
 };
