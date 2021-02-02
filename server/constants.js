@@ -14,7 +14,7 @@ class Player {
         this.x = 250;
         this.y = 250;
         this.id = id;
-        this.number = "" + Math.floor(10 * Math.random());
+        this.number = "" + Math.floor(100 * Math.random());
         this.pressingRight = false;
         this.pressingLeft = false;
         this.pressingUp = false;

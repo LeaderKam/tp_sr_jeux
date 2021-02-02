@@ -54,7 +54,7 @@ io.sockets.on('connection', function (socket) {
                 PLAYER_LIST[socket.id] = player;
                 player.onConnect(socket);
 
-                socket.emit('joinResponse', { success: true });
+                socket.emit('joinResponse', { success: true, number:player.number });
                 console.log(Object.keys(PLAYER_LIST).length + " number of player");
             } else {
                 socket.emit('joinResponse', { success: false });
@@ -68,7 +68,7 @@ io.sockets.on('connection', function (socket) {
         initGame(socket, player);
         player.onConnect(socket);
         newGameDisableBtn = true;
-        socket.emit('newGameResponse', { success: true });
+        socket.emit('newGameResponse', { success: true, number:player.number });
         console.log(Object.keys(PLAYER_LIST).length + " number of player");
     });
 
@@ -103,7 +103,6 @@ io.sockets.on('connection', function (socket) {
             gameActive = true;
         }
 
-        
         if (data.inputId === 'left')
             player.pressingLeft = data.state
         if (data.inputId === 'right')
